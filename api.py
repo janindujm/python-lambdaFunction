@@ -54,6 +54,24 @@ def lambda_handler(event, context):
             'body': json.dumps({"message": "User not in group"})
         }
 
+    bucket_name = os.environ.get('bucketname')
+    region = os.environ.get('AWS_REGION')
+
+    s3_client = boto3.client("s3", region_name=region)
+
+    try:
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=file_name,
+            Body=file
+        )
+    except Exception as e:
+        logger.error(f"Error uploading file to S3: {e}")
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({"message": "Error uploading file"})
+        }
 
     logger.debug('Info')
 
